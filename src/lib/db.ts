@@ -7,15 +7,15 @@ const globalForPrisma = globalThis as unknown as {
   pool?: Pool;
 };
 
-// Supabase session pooler hanya menyediakan 15 koneksi untuk seluruh project,
-// jadi tiap instance serverless harus memakai 1 koneksi saja.
+// Supabase transaction pooler (port 6543) memakai query multiplexing, jadi
+// aman dipakai serverless yang bisa spawn banyak instance sekaligus.
 // Pool di-cache di globalThis (semua environment) supaya tidak ada dua Pool
 // dalam satu instance akibat bundling Next.js memisahkan modul ke chunk berbeda.
 const pool =
   globalForPrisma.pool ??
   new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 1,
+    max: 2,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,
     allowExitOnIdle: true,

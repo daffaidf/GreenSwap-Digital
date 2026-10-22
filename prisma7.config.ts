@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // DIRECT_URL = koneksi session pooler untuk perintah CLI (migrate/resolve).
+    // Fallback ke DATABASE_URL (transaction pooler) bila DIRECT_URL belum diset.
+    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });
