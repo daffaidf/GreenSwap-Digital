@@ -31,6 +31,38 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Production URL: https://greenswap-digital.vercel.app
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+vercel --prod          # deploy manual
+vercel env ls          # cek env var (DATABASE_URL, DIRECT_URL, NEXTAUTH_SECRET, NEXTAUTH_URL)
+```
+
+### Environment variables
+
+| Variabel          | Kegunaan                                                        |
+| ----------------- | --------------------------------------------------------------- |
+| `DATABASE_URL`    | Runtime aplikasi → Supabase **transaction pooler** (port 6543) + `?pgbouncer=true` |
+| `DIRECT_URL`      | Prisma CLI (migrate/resolve) → Supabase **session pooler** (port 5432) |
+| `NEXTAUTH_SECRET` | Secret NextAuth (`openssl rand -base64 32`)                      |
+| `NEXTAUTH_URL`    | URL production, mis. `https://greenswap-digital.vercel.app`      |
+| `NODE_VERSION`    | `22`                                                             |
+
+Session pooler hanya menyediakan 15 koneksi untuk seluruh project, jadi runtime
+wajib memakai transaction pooler (6543) yang melakukan query multiplexing.
+
+### Migrasi database
+
+Migrasi **tidak** dijalankan di build step Vercel (butuh koneksi DB dan bisa
+gagal saat pooler penuh). Jalankan manual dari mesin lokal:
+
+```bash
+npx prisma migrate deploy     # pakai DIRECT_URL
+npx prisma generate
+```
+
+### Auto-deploy dari GitHub
+
+Project belum terhubung ke repo GitHub. Pasang GitHub App Vercel di
+https://github.com/apps/vercel (pilih repo `GreenSwap-Digital`), lalu
+Settings → Git → Connect Git Repository.
