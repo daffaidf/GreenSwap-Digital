@@ -7,25 +7,24 @@ const globalForPrisma = globalThis as unknown as {
   pool?: Pool;
 };
 
+// Supabase session pooler hanya menyediakan 15 koneksi untuk seluruh project,
+// jadi tiap instance serverless harus memakai 1 koneksi saja.
+// Pool di-cache di globalThis (semua environment) supaya tidak ada dua Pool
+// dalam satu instance akibat bundling Next.js memisahkan modul ke chunk berbeda.
 const pool =
   globalForPrisma.pool ??
   new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 5,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    max: 1,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+    allowExitOnIdle: true,
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.pool = pool;
-}
+globalForPrisma.pool = pool;
 
 const adapter = new PrismaPg(pool);
 
-export const db =
-  globalForPrisma.prisma ??
-  new PrismaClient({ adapter });
+export const db = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
-}
+globalForPrisma.prisma = db;
