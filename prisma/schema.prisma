@@ -1,0 +1,105 @@
+// GreenSwap Digital — Schema v1 (Fase 1)
+// Sesuai PRD §6 Data Model: User, Item, SwapRequest
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ──────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Category {
+  BUKU
+  PAKAIAN
+  ELEKTRONIK
+  ALAT_TULIS
+  AKSESORIS
+  LAINNYA
+}
+
+enum ItemType {
+  BARTER
+  DONASI
+}
+
+enum ItemStatus {
+  AVAILABLE
+  PENDING
+  SWAPPED
+  DONATED
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+// ── Models ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  waNumber  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items            Item[]        @relation("OwnedItems")
+  sentRequests     SwapRequest[] @relation("Requester")
+  receivedRequests SwapRequest[] @relation("Receiver")
+}
+
+model Item {
+  id          String     @id @default(uuid())
+  ownerId     String
+  owner       User       @relation("OwnedItems", fields: [ownerId], references: [id], onDelete: Cascade)
+  title       String
+  description String     @db.Text
+  category    Category
+  type        ItemType
+  status      ItemStatus @default(AVAILABLE)
+  imageUrl    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  targetRequests  SwapRequest[] @relation("TargetItem")
+  offeredRequests SwapRequest[] @relation("OfferedItem")
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([category])
+  @@index([type])
+}
+
+model SwapRequest {
+  id           String        @id @default(uuid())
+  requesterId  String
+  receiverId   String
+  requester    User          @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver     User          @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  targetItemId String
+  targetItem   Item          @relation("TargetItem", fields: [targetItemId], references: [id], onDelete: Cascade)
+  offeredItemId String?
+  offeredItem   Item?        @relation("OfferedItem", fields: [offeredItemId], references: [id], onDelete: SetNull)
+  status       RequestStatus @default(PENDING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([requesterId])
+  @@index([receiverId])
+  @@index([targetItemId])
+  @@index([status])
+}
