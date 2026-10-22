@@ -9,6 +9,7 @@ import {
   Check,
   LucideIcon,
 } from "lucide-react";
+import { normalizeWaNumber } from "@/lib/phone";
 
 export type RequestView = {
   id: string;
@@ -52,7 +53,9 @@ function waLink(
 ) {
   const verb = isBarter ? "menukar" : "mengambil";
   const text = `Halo ${counterpartName}, saya ${myName} dari GreenSwap Kampus. Saya ingin COD untuk ${verb} "${itemTitle}". Kapan dan di mana bisa janjian?`;
-  return `https://wa.me/${waNumber.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(text)}`;
+  const digits =
+    normalizeWaNumber(waNumber) ?? waNumber.replace(/[^0-9]/g, "");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }
 
 export function RequestCard({

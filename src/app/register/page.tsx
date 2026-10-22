@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Mail, Lock, Phone, Loader2, ArrowRight } from "lucide-react";
+import { normalizeWaNumber } from "@/lib/phone";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,6 +16,9 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const waPreview = form.waNumber.trim() ? normalizeWaNumber(form.waNumber) : null;
+  const waInvalid = form.waNumber.trim().length > 0 && !waPreview;
 
   function update(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -121,15 +125,35 @@ export default function RegisterPage() {
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   required
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
                   value={form.waNumber}
                   onChange={(e) => update("waNumber", e.target.value)}
-                  placeholder="Contoh: 6281234567890"
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50"
+                  placeholder="Contoh: 081234567890"
+                  aria-invalid={waInvalid}
+                  className={`w-full rounded-2xl border bg-slate-50/50 pl-11 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:bg-white focus:ring-4 focus:ring-emerald-50 ${
+                    waInvalid
+                      ? "border-rose-300 focus:border-rose-500 focus:ring-rose-50"
+                      : "border-slate-200 focus:border-emerald-500 focus:ring-emerald-50"
+                  }`}
                 />
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">
-                Gunakan format awalan 628... agar tombol chat otomatis berfungsi saat ada transaksi barter.
-              </p>
+              {waInvalid ? (
+                <p className="mt-1 text-[11px] font-semibold text-rose-600">
+                  Nomor WhatsApp tidak valid. Contoh: 081234567890
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Boleh tulis 08…, +62, atau 628… — otomatis disimpan jadi format
+                  internasional supaya tombol chat WhatsApp berfungsi.
+                  {waPreview && (
+                    <span className="mt-0.5 block font-semibold text-emerald-600">
+                      Akan disimpan sebagai: {waPreview}
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
 
             <div>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { normalizeWaNumber } from "@/lib/phone";
 
 export async function POST(req: Request) {
   try {
@@ -8,11 +9,21 @@ export async function POST(req: Request) {
     const name = String(body?.name ?? "").trim();
     const email = String(body?.email ?? "").toLowerCase().trim();
     const password = String(body?.password ?? "");
-    const waNumber = String(body?.waNumber ?? "").trim();
+    const rawWaNumber = String(body?.waNumber ?? "").trim();
+    const waNumber = normalizeWaNumber(rawWaNumber);
 
-    if (!name || !email || !password || !waNumber) {
+    if (!name || !email || !password || !rawWaNumber) {
       return NextResponse.json(
         { message: "Nama, email, password, dan nomor WhatsApp wajib diisi." },
+        { status: 400 }
+      );
+    }
+    if (!waNumber) {
+      return NextResponse.json(
+        {
+          message:
+            "Nomor WhatsApp tidak valid. Contoh: 081234567890 (minimal 10 digit).",
+        },
         { status: 400 }
       );
     }
