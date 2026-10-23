@@ -3,6 +3,7 @@ import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PlusCircle, Compass, ArrowLeftRight, User, ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export async function Navbar() {
   const session = await getServerSession(authOptions);
@@ -14,9 +15,7 @@ export async function Navbar() {
         {/* Brand Logo */}
         <div className="flex items-center gap-6">
           <Link href="/" className="group flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-md shadow-emerald-600/20 transition-transform group-hover:scale-105">
-              <span className="text-lg">♻️</span>
-            </div>
+            <Logo className="h-9 w-9 rounded-xl bg-emerald-600 shadow-md shadow-emerald-600/20 transition-transform group-hover:scale-105" />
             <div className="flex flex-col">
               <span className="text-base font-extrabold tracking-tight text-slate-900 group-hover:text-emerald-700 transition">
                 GreenSwap <span className="text-emerald-600">Digital</span>

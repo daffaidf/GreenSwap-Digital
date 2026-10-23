@@ -5,6 +5,7 @@ import { getSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export default function LoginPage() {
   return (
@@ -58,9 +59,7 @@ function LoginForm() {
         {/* Brand Header */}
         <div className="text-center mb-6">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-2xl text-white shadow-xl shadow-emerald-500/30">
-              ♻️
-            </div>
+            <Logo className="h-12 w-12 rounded-2xl bg-emerald-500 text-2xl shadow-xl shadow-emerald-500/30" />
             <div className="text-left">
               <span className="text-xl font-extrabold text-white">GreenSwap</span>
               <span className="block text-[10px] font-semibold text-emerald-400 uppercase tracking-widest">

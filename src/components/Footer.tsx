@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Leaf, ShieldCheck, HeartHandshake, Sparkles } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
@@ -46,9 +47,7 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 text-xl font-black text-emerald-600">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-base text-white shadow-sm">
-                ♻️
-              </span>
+              <Logo className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-base text-white shadow-sm" />
               <span>GreenSwap <span className="text-slate-800">Digital</span></span>
             </Link>
             <p className="mt-3 max-w-sm text-sm text-slate-500 leading-relaxed">
